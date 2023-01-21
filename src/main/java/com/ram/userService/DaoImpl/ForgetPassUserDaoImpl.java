@@ -34,6 +34,7 @@ public class ForgetPassUserDaoImpl  implements ForgetPassUserDao{
 	        
 	     String otpCode= String.format("%06d", number);
 		 User user=repo.findByEmail(email);
+         System.out.println("Entry point of the email and all set is good");
 		 ResponseStatus status=new ResponseStatus();
 		if(user==null)
 		{
@@ -43,6 +44,7 @@ public class ForgetPassUserDaoImpl  implements ForgetPassUserDao{
 		}
 		else
 		{
+		     String verifyLink="verify/user/password/".concat(otpCode).concat("/").concat(user.getUsername());
 		        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");  
 			    Date date = new Date();  
 			    String registeredDate=formatter.format(date);
@@ -51,13 +53,13 @@ public class ForgetPassUserDaoImpl  implements ForgetPassUserDao{
 		     repo.save(user);
 			try {
 				System.out.println("Before Mail Send the error we get");
-				status=utiity.SendEmail(email);
+				status=utiity.SendEmail(email,verifyLink);
 				int StatusCode=status.getResponseCode();
 				if(StatusCode==200)
 				{
 					     status.setResponseCode(200);
 					    status.setResponseStatus("Mail send Successfully");
-					    status.setStatusMessage("Send Successfully ");
+					    status.setStatusMessage("Verification link send to your gmail please check");
 				}
 			} catch (MessagingException e) {
 				// TODO Auto-generated catch block

@@ -1,5 +1,6 @@
 package com.ram.userService.DaoImpl;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -60,6 +61,8 @@ public class UserRegisterDaoImpl  implements UserServiceDao{
 	public ResponseStatus userRegisterDao(User user) throws ParseException {
       User user1=repository.findByUsername(user.getUsername());
       
+      String verifyLink="mail/verify/".concat(otpCode).concat("/").concat(user.getUsername());
+      System.out.println("Link before sending Mail"+verifyLink);
 		ResponseStatus registerStatus=new ResponseStatus();
 		if(user1==null)
 		{
@@ -101,7 +104,7 @@ public class UserRegisterDaoImpl  implements UserServiceDao{
 				repository.save(user);
 				ResponseStatus emailStatus=null;
 				try {
-					emailStatus=utility.SendEmail(user.getEmail());
+					emailStatus=utility.SendEmail(user.getEmail(),verifyLink);
 				} catch (MessagingException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -111,7 +114,7 @@ public class UserRegisterDaoImpl  implements UserServiceDao{
 				{
 					registerStatus.setResponseCode(200);
 					registerStatus.setResponseStatus("Register Successfully");
-					registerStatus.setStatusMessage("Successfully Register uisng mail Id  "+user.getEmail());
+					registerStatus.setStatusMessage("erification code send on your Email "+user.getEmail());
 				}
 				else
 				{
@@ -135,7 +138,7 @@ public class UserRegisterDaoImpl  implements UserServiceDao{
 	}
 
 	
-	// testing for mail Sending 
+	
 public ResponseStatus SendEmailFromClass(String email) {
 		
 	MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -153,7 +156,7 @@ public ResponseStatus SendEmailFromClass(String email) {
          mailSender.send(mimeMessage);
              status.setResponseCode(200);
              status.setResponseStatus("Mail Send Successfully");
-			 status.setStatusMessage("User Registraton successfully");
+			 status.setStatusMessage("User Registraton successfully and code send your registered mail Id");
 			 System.out.println("In sendEMail "+status);
 
      } catch (MessagingException e) {

@@ -26,6 +26,7 @@ import com.ram.userService.Model.forgotPassRequest;
 import com.ram.userService.config.JwtTokenUtil;
 import com.ram.userService.service.ForgetPassUserService;
 import com.ram.userService.service.JwtUserDetailService;
+import com.ram.userService.service.MailerifyUser;
 import com.ram.userService.service.UpdatePassService;
 import com.ram.userService.service.UserRegisterService;
 import com.ram.userService.util.ResponseStatus;
@@ -47,7 +48,8 @@ public class UserAllServiceController {
 	ForgetPassUserService  forgotService;
 	
 	
-	
+	@Autowired
+	MailerifyUser mailService;
 	
 	
 	@Autowired
@@ -114,7 +116,16 @@ public class UserAllServiceController {
 		return ResponseEntity.ok(registerStatus);
 	}
 	
-	
+	@RequestMapping(value="/mail/verify/{otpCode}/{username}",method= {RequestMethod.GET})
+	public ResponseEntity<ResponseStatus> getMailVerifyUser(@PathVariable("otpCode") String otpCode,@PathVariable("username") String username)
+	{
+		System.out.println("Get Otp from User is"+otpCode);
+		
+		ResponseStatus statusOfOtp=new ResponseStatus();
+		statusOfOtp=mailService.getMailVerified(otpCode,username);
+					
+		return  ResponseEntity.ok(statusOfOtp);
+	}
 	
 	@CrossOrigin("*")
 	@RequestMapping(value="/user/forgotPassword",method= {RequestMethod.POST})
@@ -124,6 +135,12 @@ public class UserAllServiceController {
 		return ResponseEntity.ok(status);
 	}
 	
+	@RequestMapping(value="/verify/user/password/{otpCode}/{username}",method= {RequestMethod.GET})
+	public ResponseEntity<ResponseStatus>  verifyUserForrupdatePassword(@PathVariable("otpCode") String otpCode,@PathVariable("username") String username)
+	{
+		ResponseStatus status=mailService.getMailVerified(otpCode,username);
+		return  ResponseEntity.ok(status);
+	}
 	
 	
 	@RequestMapping(value="/user/Update/password",method= {RequestMethod.POST})

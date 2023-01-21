@@ -19,7 +19,8 @@ public class SendMailUtility {
     JavaMailSender mailSender;
 	
 	 @Value("${spring.mail.username}") private String sender;
-	public ResponseStatus SendEmail(String email) throws MessagingException {
+   private static final String verifyUrl="http://localhost:8100";
+	public ResponseStatus SendEmail(String email, String verifyLink) throws MessagingException {
 		
 		
 		MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -31,12 +32,14 @@ public class SendMailUtility {
 	         mimeMessageHelper.setSubject("Email verification ");
 	         mimeMessageHelper.setFrom(sender);
 	         mimeMessageHelper.setTo(email);
+	         boolean html = true;
+	         mimeMessageHelper.setText("<b>Hey guys Please click the link for verify </b>,<br><br><br><br><a href=\""+verifyUrl+"/"+verifyLink+"\">Please click the link to verify </a>", html);
 	         
 	          
-	             mailSender.send(mimeMessage);
+	         mailSender.send(mimeMessage);
 	             status.setResponseCode(200);
 	             status.setResponseStatus("Mail Send Successfully");
-				 status.setStatusMessage("User Registraton successfully");
+				 status.setStatusMessage("User Registraton successfully and code send your registered mail Id");
 				 System.out.println("In sendEMail "+status);
 
 	     } catch (MessagingException e) {
